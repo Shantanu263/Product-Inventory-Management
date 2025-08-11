@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@SuppressWarnings("JpaDataSourceORMInspection")
 @Entity
 @Table(name = "Admin")
 @Getter
