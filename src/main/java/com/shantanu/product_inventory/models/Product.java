@@ -22,6 +22,10 @@ public class Product {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date createdDate;
     private String imageUrl;
+    private String productDescription;
+
+    @Column(nullable = false, columnDefinition = "double precision default 0.0")
+    private double averageRating = 0.0;
 
     @ManyToOne
     @JoinColumn(name = "categoryId")

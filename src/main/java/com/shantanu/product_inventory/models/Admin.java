@@ -11,9 +11,14 @@ import lombok.Setter;
 public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int adminId;
+    private Long adminId;
 
     @Column(unique = true)
     private String username;
     private String password;
+
+    @Column(unique = true)
+    private String email;
+
+    private String role;
 }

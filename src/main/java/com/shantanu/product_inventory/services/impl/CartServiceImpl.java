@@ -1,6 +1,8 @@
 package com.shantanu.product_inventory.services.impl;
 
+import com.shantanu.product_inventory.models.Admin;
 import com.shantanu.product_inventory.models.CartItem;
+import com.shantanu.product_inventory.models.Product;
 import com.shantanu.product_inventory.repositories.AdminRepo;
 import com.shantanu.product_inventory.repositories.CartItemRepo;
 import com.shantanu.product_inventory.repositories.ProductRepo;
@@ -19,8 +21,8 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartItem addToCart(Long userId, int productId, int quantity) {
-        var user = userRepo.findById(userId).orElseThrow();
-        var product = productRepo.findById(productId).orElseThrow();
+        Admin user = userRepo.findById(userId).orElseThrow();
+        Product product = productRepo.findById(productId).orElseThrow();
 
         CartItem item = new CartItem();
         item.setUser(user);
@@ -37,14 +39,14 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void removeCartItem(Long itemId, Long userId) {
-        var item = cartRepo.findById(itemId).orElseThrow();
+        CartItem item = cartRepo.findById(itemId).orElseThrow();
         if (!item.getUser().getAdminId().equals(userId)) throw new RuntimeException("Unauthorized");
         cartRepo.delete(item);
     }
 
     @Override
     public CartItem updateQuantity(Long itemId, int quantity, Long userId) {
-        var item = cartRepo.findById(itemId).orElseThrow();
+        CartItem item = cartRepo.findById(itemId).orElseThrow();
         if (!item.getUser().getAdminId().equals(userId)) throw new RuntimeException("Unauthorized");
         item.setQuantity(quantity);
         return cartRepo.save(item);
