@@ -2,6 +2,7 @@ package com.shantanu.product_inventory.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -29,8 +30,11 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/auth/refresh-token", "/api/products/upload-image").permitAll()
-                        .requestMatchers("/api/auth/change-password" , "/api/auth/logout").authenticated()
+                        .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/auth/refresh-token", "/api/products/upload-image", "/api/forgot-password/verifyMail/**", "/api/forgot-password/verifyOtp/**").permitAll()
+                        .requestMatchers("/api/auth/change-password", "/api/auth/logout", "/api/forgot-password/change-password").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers("/api/products/**", "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers("/api/cart/**", "/api/orders/**", "/api/product-rating/**").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

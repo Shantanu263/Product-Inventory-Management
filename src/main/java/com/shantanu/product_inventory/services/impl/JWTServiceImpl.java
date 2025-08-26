@@ -4,7 +4,6 @@ import com.shantanu.product_inventory.models.Admin;
 import com.shantanu.product_inventory.services.JWTService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,19 +23,25 @@ public class JWTServiceImpl implements JWTService {
     }
 
     @Override
-    public String generateToken(String username, long time) {
+    public String generateToken(String username, String role, long time) {
         return Jwts
                 .builder()
                 .subject(username)
+                .claim("role",role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + time))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .signWith(getKey())
                 .compact();
     }
 
     @Override
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    @Override
+    public String extractRole(String token) {
+        return extractAllClaims(token).get("role",String.class);
     }
 
     @Override

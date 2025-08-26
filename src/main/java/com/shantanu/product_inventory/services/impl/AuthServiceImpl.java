@@ -2,6 +2,7 @@ package com.shantanu.product_inventory.services.impl;
 
 import com.shantanu.product_inventory.dtos.AdminDTO;
 import com.shantanu.product_inventory.dtos.changePasswordDTO;
+import com.shantanu.product_inventory.globalExceptionHandlers.ResourceNotFoundException;
 import com.shantanu.product_inventory.models.Admin;
 import com.shantanu.product_inventory.repositories.AdminRepo;
 import com.shantanu.product_inventory.services.AuthService;
@@ -37,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
         Admin admin = new Admin();
         admin.setUsername(adminDTO.getUsername());
         admin.setPassword(encoder.encode(adminDTO.getPassword()));
+        admin.setRole("CUSTOMER");                 //default signup customer
         adminRepo.save(admin);
     }
 
@@ -49,18 +51,18 @@ public class AuthServiceImpl implements AuthService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
 
-        String token = jwtService.generateToken(user.getUsername(), accessTokenTime);
-        String refreshToken = jwtService.generateToken(user.getUsername(), refreshTokenTime);
+        String token = jwtService.generateToken(user.getUsername(), user.getRole(), accessTokenTime);
+        String refreshToken = jwtService.generateToken(user.getUsername(),user.getRole(), refreshTokenTime);
+        String role = user.getRole();
 
-        Map<String, String> tokens = Map.of("accessToken", token, "refreshToken", refreshToken);
+        Map<String, String> tokens = Map.of("accessToken", token, "refreshToken", refreshToken, "role", role);
         return ResponseEntity.ok(tokens);
     }
 
     @Override
     public ResponseEntity<?> changePassword(changePasswordDTO request) {
-        Admin admin = getAdminFromAuth();
+        Admin admin = fetchUserDetails();
         String username = admin.getUsername();
-        //System.out.println("username : " + username);
 
         Admin user = adminRepo.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -81,7 +83,9 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
 
-    private static Admin getAdminFromAuth() {
+
+    @Override
+    public Admin fetchUserDetails() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (Admin) auth.getPrincipal();
     }
@@ -102,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid refresh token");
         }
 
-        String newAccessToken = jwtService.generateToken(username, accessTokenTime); // generate new Access Token
+        String newAccessToken = jwtService.generateToken(username, user.getRole(), accessTokenTime); // generate new Access Token
 
         return ResponseEntity.ok(Map.of("accessToken",newAccessToken));
     }

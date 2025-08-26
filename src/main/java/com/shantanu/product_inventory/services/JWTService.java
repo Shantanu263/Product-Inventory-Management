@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.function.Function;
 
 public interface JWTService {
-    String generateToken(String username, long time);
+    String generateToken(String username, String role, long time);
 
     String extractUsername(String token);
 
@@ -20,4 +20,6 @@ public interface JWTService {
     boolean isTokenExpired(String token);
 
     Date extractExpiration(String token);
+
+    String extractRole(String jwtToken);
 }

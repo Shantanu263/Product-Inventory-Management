@@ -3,6 +3,7 @@ package com.shantanu.product_inventory.services;
 import com.shantanu.product_inventory.dtos.ProductDTO;
 import com.shantanu.product_inventory.dtos.ProductResponsePageDTO;
 import com.shantanu.product_inventory.models.Product;
+import org.hibernate.boot.model.source.spi.SingularAttributeSourceOneToOne;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

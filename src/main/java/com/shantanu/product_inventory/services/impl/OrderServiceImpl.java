@@ -26,10 +26,10 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public Order placeOrder(Long userId) {
-        var user = userRepo.findById(userId)
+        Admin user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("user", "user Id", userId));
 
-        var cartItems = cartRepo.findByUser_adminId(userId);
+        List<CartItem> cartItems = cartRepo.findByUser_adminId(userId);
 
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
@@ -86,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order getOrderById(Long orderId, Long userId) {
-        var order = orderRepo.findById(orderId).orElseThrow();
+        Order order = orderRepo.findById(orderId).orElseThrow();
         if (!order.getUser().getAdminId().equals(userId)) {
             throw new RuntimeException("Unauthorized");
         }
