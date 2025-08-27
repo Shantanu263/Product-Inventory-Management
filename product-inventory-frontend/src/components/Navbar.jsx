@@ -183,7 +183,7 @@ const Navbar = ({ onSearch }) => {
               </div>
               <ul tabIndex={0} className="mt-3 z-[100] p-2 shadow menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box w-52">
                 <li>
-                  <Link to="/change-password" className="text-base font-medium"><LockKeyhole /> Change Password</Link>
+                  <Link to="/change-password" className="text-base font-medium"><LockKeyhole /> Change your Password</Link>
                 </li>
                 <li>
                   <button onClick={handleLogout} className="text-base font-medium"><LogOut /> Logout</button>
