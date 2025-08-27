@@ -48,7 +48,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
                 .user(user)
                 .build();
 
-        forgotPasswordOTPRepo.deleteAllByUser_Email(email);     //delete all previous OTPs for specific user
+        //forgotPasswordOTPRepo.deleteAllByUser_Email(email);     //delete all previous OTPs for specific user
         emailService.sendSimpleMessage(mailBody);               //Send mail to user
         forgotPasswordOTPRepo.save(forgotPasswordOTP);          //save new OTP
     }
