@@ -38,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
         Admin admin = new Admin();
         admin.setUsername(adminDTO.getUsername());
         admin.setPassword(encoder.encode(adminDTO.getPassword()));
+        admin.setEmail(adminDTO.getEmail());
         admin.setRole("CUSTOMER");                 //default signup customer
         adminRepo.save(admin);
     }
