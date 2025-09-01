@@ -13,15 +13,14 @@ import java.util.List;
 public class MyControllerAdvice {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> resourceNotFound(ResourceNotFoundException e){
+    public ResponseEntity<String> resourceNotFound(ResourceNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<String>> argumentNotValid(MethodArgumentNotValidException e){
+    public ResponseEntity<List<String>> argumentNotValid(MethodArgumentNotValidException e) {
         List<String> errors = new ArrayList<>();
         e.getBindingResult().getFieldErrors().forEach(error -> errors.add(error.getDefaultMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
-
 }

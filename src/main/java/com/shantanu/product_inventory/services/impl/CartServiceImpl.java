@@ -1,5 +1,6 @@
 package com.shantanu.product_inventory.services.impl;
 
+import com.shantanu.product_inventory.globalExceptionHandlers.ResourceNotFoundException;
 import com.shantanu.product_inventory.models.Admin;
 import com.shantanu.product_inventory.models.CartItem;
 import com.shantanu.product_inventory.models.Product;
@@ -21,8 +22,8 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartItem addToCart(Long userId, int productId, int quantity) {
-        Admin user = userRepo.findById(userId).orElseThrow();
-        Product product = productRepo.findById(productId).orElseThrow();
+        Admin user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User","id",userId));
+        Product product = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("product","id",productId));
 
         CartItem item = new CartItem();
         item.setUser(user);
@@ -39,14 +40,14 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void removeCartItem(Long itemId, Long userId) {
-        CartItem item = cartRepo.findById(itemId).orElseThrow();
+        CartItem item = cartRepo.findById(itemId).orElseThrow(() -> new ResourceNotFoundException("Cart","id",itemId));
         if (!item.getUser().getAdminId().equals(userId)) throw new RuntimeException("Unauthorized");
         cartRepo.delete(item);
     }
 
     @Override
     public CartItem updateQuantity(Long itemId, int quantity, Long userId) {
-        CartItem item = cartRepo.findById(itemId).orElseThrow();
+        CartItem item = cartRepo.findById(itemId).orElseThrow(() -> new ResourceNotFoundException("Cart","id",itemId));
         if (!item.getUser().getAdminId().equals(userId)) throw new RuntimeException("Unauthorized");
         item.setQuantity(quantity);
         return cartRepo.save(item);

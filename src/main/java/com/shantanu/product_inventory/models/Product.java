@@ -1,6 +1,7 @@
 package com.shantanu.product_inventory.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,7 @@ public class Product {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date createdDate;
     private String imageUrl;
+    private String imagePublicId;
     private String productDescription;
 
     @Column(nullable = false, columnDefinition = "double precision default 0.0")
@@ -30,5 +32,9 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private Category category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private java.util.List<ProductRating> ratings;
 
 }

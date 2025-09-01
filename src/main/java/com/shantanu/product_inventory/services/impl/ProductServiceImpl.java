@@ -42,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
 
         Map<?, ?> imageRequest = uploadImage(image);
         product.setImageUrl((String) imageRequest.get("secure_url"));
+        product.setImagePublicId((String) imageRequest.get("public_id"));
         productRepo.save(product);
     }
 
@@ -66,19 +67,26 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setName(productDTO.getName());
         existingProduct.setPrice(productDTO.getPrice());
         existingProduct.setQuantity(productDTO.getQuantity());
+        existingProduct.setProductDescription(productDTO.getProductDescription());
         //existingProduct.setImageUrl(productDTO.getImageUrl());
 
         Category category = categoryRepo.findById(productDTO.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Category","Id",productDTO.getCategoryId()));
         existingProduct.setCategory(category);
 
-        Map<?, ?> imageRequest = uploadImage(image);
-        existingProduct.setImageUrl((String) imageRequest.get("secure_url"));
+        if (image != null && !image.isEmpty()) {
+            if (existingProduct.getImagePublicId() != null) cloudinaryService.removeImage(existingProduct.getImagePublicId());
+            Map<?, ?> imageRequest = uploadImage(image);
+            existingProduct.setImageUrl((String) imageRequest.get("secure_url"));
+            existingProduct.setImagePublicId((String) imageRequest.get("public_id"));
+        }
 
         return productRepo.save(existingProduct);
     }
 
     @Override
     public void deleteProduct(int id){
+        Product product = productRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product","id",id));
+        if (product.getImageUrl() != null && product.getImagePublicId()!=null) System.out.println(cloudinaryService.removeImage(product.getImagePublicId()));
         productRepo.deleteById(id);
     }
 
@@ -106,7 +114,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Map<?, ?> uploadImage(MultipartFile file){
-        if (!cloudinaryService.isImageFile(file)) throw new RuntimeException("Provided file is not an image file");
         return cloudinaryService.uploadImage(file,"Products");
     }
 }

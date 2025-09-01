@@ -81,12 +81,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getOrders(Long userId) {
-        return orderRepo.findByUser_adminId(userId);
+        return orderRepo.findByUser_adminId(userId).orElseThrow(()-> new ResourceNotFoundException("Orders","userID",userId));
     }
 
     @Override
     public Order getOrderById(Long orderId, Long userId) {
-        Order order = orderRepo.findById(orderId).orElseThrow();
+        Order order = orderRepo.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order","id",orderId));
         if (!order.getUser().getAdminId().equals(userId)) {
             throw new RuntimeException("Unauthorized");
         }

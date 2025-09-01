@@ -3,6 +3,7 @@ package com.shantanu.product_inventory.controllers;
 import com.shantanu.product_inventory.models.CartItem;
 import com.shantanu.product_inventory.services.CartService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -14,23 +15,24 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/add")
-    public CartItem addToCart(@RequestParam int productId, @RequestParam int quantity, @RequestAttribute Long userId) {
-        return cartService.addToCart(userId, productId, quantity);
+    public ResponseEntity<?> addToCart(@RequestParam int productId, @RequestParam int quantity, @RequestAttribute Long userId) {
+        return ResponseEntity.ok(cartService.addToCart(userId, productId, quantity));
     }
 
     @GetMapping
-    public List<CartItem> getCart(@RequestAttribute Long userId) {
-        return cartService.getCartItems(userId);
+    public ResponseEntity<?> getCart(@RequestAttribute Long userId) {
+        return ResponseEntity.ok(cartService.getCartItems(userId));
     }
 
     @DeleteMapping("/{itemId}")
-    public void removeItem(@PathVariable Long itemId, @RequestAttribute Long userId) {
+    public ResponseEntity<?> removeItem(@PathVariable Long itemId, @RequestAttribute Long userId) {
         cartService.removeCartItem(itemId, userId);
+        return ResponseEntity.ok("Cart Item with item id"+itemId+" removed");
     }
 
     @PutMapping("/{itemId}")
-    public CartItem updateQuantity(@PathVariable Long itemId, @RequestParam int quantity, @RequestAttribute Long userId) {
-        return cartService.updateQuantity(itemId, quantity, userId);
+    public ResponseEntity<?> updateQuantity(@PathVariable Long itemId, @RequestParam int quantity, @RequestAttribute Long userId) {
+        return ResponseEntity.ok(cartService.updateQuantity(itemId, quantity, userId));
     }
 }
 

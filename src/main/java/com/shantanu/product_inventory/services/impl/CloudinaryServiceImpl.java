@@ -17,6 +17,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     @Override
     public boolean isImageFile(MultipartFile file) {
         String fileType = file.getContentType();
+        System.out.println(fileType);
         return  (fileType != null && fileType.startsWith("image/"));
     }
 
@@ -26,6 +27,15 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             return cloudinary.uploader().upload(file.getBytes(), Map.of("asset_folder",folderName));
         } catch (IOException e) {
             throw new RuntimeException("Error reading image file.");
+        }
+    }
+
+    @Override
+    public String removeImage(String imagePublicId) {
+        try {
+            return cloudinary.uploader().destroy(imagePublicId, Map.of()).toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Error deleting image file");
         }
     }
 }

@@ -18,6 +18,7 @@ public class Category {
     private String categoryName;
     private String categoryDescription;
     private String imageUrl;
+    private String imagePublicId;
 
     @OneToMany(mappedBy = "category")
     @JsonIgnore

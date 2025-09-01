@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Date;
@@ -30,6 +31,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
     private final PasswordEncoder encoder;
 
     @Override
+    @Transactional
     public void verifyEmail(String email) {
         Admin user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User","Email Id",email));
@@ -42,15 +44,14 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
                 .subject("OTP for Password Reset")
                 .build();
 
-        ForgotPasswordOTP forgotPasswordOTP = ForgotPasswordOTP.builder()
-                .otp(otp)
-                .expirationTime(new Date(System.currentTimeMillis() + 90 * 1000))   //90 seconds
-                .user(user)
-                .build();
+        ForgotPasswordOTP forgotPasswordOTP = forgotPasswordOTPRepo.findByUser(user)
+                .orElse(ForgotPasswordOTP.builder().user(user).build());
 
-        //forgotPasswordOTPRepo.deleteAllByUser_Email(email);     //delete all previous OTPs for specific user
-        emailService.sendSimpleMessage(mailBody);               //Send mail to user
-        forgotPasswordOTPRepo.save(forgotPasswordOTP);          //save new OTP
+        forgotPasswordOTP.setOtp(otp);
+        forgotPasswordOTP.setExpirationTime(new Date(System.currentTimeMillis() + 90 * 1000));
+
+        emailService.sendSimpleMessage(mailBody);                               // Send mail to user
+        forgotPasswordOTPRepo.save(forgotPasswordOTP);                          //save new OTP
     }
 
     @Override

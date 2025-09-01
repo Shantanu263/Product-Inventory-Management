@@ -5,14 +5,14 @@ import com.shantanu.product_inventory.models.Category;
 import com.shantanu.product_inventory.models.Product;
 import com.shantanu.product_inventory.repositories.CategoryRepo;
 import com.shantanu.product_inventory.repositories.ProductRepo;
+import com.shantanu.product_inventory.services.CloudinaryService;
 import com.shantanu.product_inventory.services.ExcelService;
 import jakarta.validation.ConstraintViolation;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import jakarta.validation.Validator;
@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ExcelServiceImpl implements ExcelService {
 
+    private final CloudinaryService cloudinaryService;
     private final CategoryRepo categoryRepo;
     private final Validator validator;
     private final ModelMapper modelMapper;
@@ -87,6 +88,15 @@ public class ExcelServiceImpl implements ExcelService {
 //                    }
 //                    else productDTO.setImageUrl(imageURLCell.getStringCellValue());
 
+                    // Product Description
+                    Cell descCell = row.getCell(4);
+                    if (descCell == null || descCell.getCellType() != CellType.STRING || descCell.getStringCellValue().isBlank()) {
+                        rowErrors.add("Description is invalid or blank");
+                    } else {
+                        productDTO.setProductDescription(descCell.getStringCellValue());
+                    }
+
+
                     // Verify the productDTO
                     Set<ConstraintViolation<ProductDTO>> violations = validator.validate(productDTO);
                     if (!violations.isEmpty()) {
@@ -137,5 +147,4 @@ public class ExcelServiceImpl implements ExcelService {
         String fileType = file.getContentType();
         return (Objects.equals(fileType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
     }
-
 }

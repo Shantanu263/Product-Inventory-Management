@@ -16,5 +16,5 @@ public class CategoryDTO {
     private String categoryDescription;
 
     //@NotBlank(message = "Image URL is required")
-    private String imageUrl;
+//    private String imageUrl;
 }

@@ -21,8 +21,10 @@ public class ProductDTO {
     @NotNull(message = "Product Category not mentioned")
     private int categoryId;
 
+    @NotNull(message = "Product Description not mentioned")
+    private String productDescription;
+}
+
 //    @NotBlank(message = "Image URL is required")
 //    private String imageUrl;
-
-}
 

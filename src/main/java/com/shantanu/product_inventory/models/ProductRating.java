@@ -1,5 +1,6 @@
 package com.shantanu.product_inventory.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,5 +24,6 @@ public class ProductRating {
 
     @ManyToOne
     @JoinColumn(name = "productId")
+    @JsonBackReference
     private Product product;
 }

@@ -3,10 +3,12 @@ package com.shantanu.product_inventory.controllers;
 import com.shantanu.product_inventory.dtos.CategoryDTO;
 import com.shantanu.product_inventory.models.Category;
 import com.shantanu.product_inventory.services.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,8 +26,9 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createCategory(@RequestBody CategoryDTO categoryDTO) {
-        categoryService.createCategory(categoryDTO);
+    public ResponseEntity<String> createCategory(@RequestPart("categoryDTO") @Valid CategoryDTO categoryDTO,
+                                                 @RequestPart("image")MultipartFile image) {
+        categoryService.createCategory(categoryDTO,image);
         return ResponseEntity.status(HttpStatus.CREATED).body("Category created successfully");
     }
 
@@ -36,8 +39,10 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable int id, @RequestBody CategoryDTO categoryDTO) {
-        Category updatedCategory = categoryService.updateCategory(id, categoryDTO);
+    public ResponseEntity<Category> updateCategory(@PathVariable int id,
+                                                   @RequestPart("categoryDTO") @Valid CategoryDTO categoryDTO,
+                                                   @RequestPart(value = "image", required = false) MultipartFile image) {
+        Category updatedCategory = categoryService.updateCategory(id, categoryDTO,image);
         return ResponseEntity.ok(updatedCategory);
     }
 
