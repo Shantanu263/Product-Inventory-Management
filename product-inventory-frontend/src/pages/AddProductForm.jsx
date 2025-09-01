@@ -12,7 +12,6 @@ const AddProductForm = () => {
     productDescription: "",
   });
   const [displayImageFile, setDisplayImageFile] = useState(null);
-  const [galleryImageFiles, setGalleryImageFiles] = useState([]); // multiple files
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
@@ -43,16 +42,19 @@ const AddProductForm = () => {
     }
 
     const formData = new FormData();
+    // Convert string values to appropriate types
+    const productDTO = {
+      ...form,
+      price: Number(form.price),
+      quantity: Number(form.quantity),
+      categoryId: Number(form.categoryId)
+    };
+    
     formData.append(
       "productDTO",
-      new Blob([JSON.stringify(form)], { type: "application/json" })
+      new Blob([JSON.stringify(productDTO)], { type: "application/json" })
     );
-    formData.append("displayImage", displayImageFile);
-
-    // Only append gallery images if provided
-    galleryImageFiles.forEach((file) => {
-      formData.append("productImages", file);
-    });
+    formData.append("image", displayImageFile);
 
     try {
       await addProduct(formData);
@@ -60,7 +62,8 @@ const AddProductForm = () => {
       navigate("/");
     } catch (err) {
       console.error("Failed to add product:", err);
-      alert("Failed to add product.");
+      const errorMessage = err.response?.data?.message || err.message || "Failed to add product";
+      alert(errorMessage);
     }
   };
 
@@ -179,23 +182,6 @@ const AddProductForm = () => {
               {errors.displayImage && (
                 <p className="text-red-500 text-sm mt-1">{errors.displayImage}</p>
               )}
-            </div>
-          </div>
-
-          {/* Gallery Images (Optional) */}
-          <div className="grid grid-cols-3 gap-4 items-center">
-            <label className="text-right font-medium">Gallery Images:</label>
-            <div className="col-span-2">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                className="file-input file-input-bordered w-full"
-                onChange={(e) => setGalleryImageFiles([...e.target.files])}
-              />
-              <p className="text-gray-500 text-sm mt-1">
-                (Optional — you can upload multiple)
-              </p>
             </div>
           </div>
 

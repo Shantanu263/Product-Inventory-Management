@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { BASE_URL, fetchCategoryById } from "../api";
+import { BASE_URL, fetchCategoryById, updateCategoryById } from "../api";
 
 export default function UpdateCategory() {
   const { id } = useParams();
@@ -10,9 +10,10 @@ export default function UpdateCategory() {
   const [formData, setFormData] = useState({
     categoryName: "",
     categoryDescription: "",
-    imageUrl: "", 
   });
-
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [currentImageUrl, setCurrentImageUrl] = useState("");
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -20,8 +21,8 @@ export default function UpdateCategory() {
         setFormData({
           categoryName: res.data.categoryName,
           categoryDescription: res.data.categoryDescription,
-          imageUrl: res.data.imageUrl || "", // Set fetched image URL
         });
+        setCurrentImageUrl(res.data.imageUrl || "");
       })
       .catch(err => console.error("Error fetching category:", err));
   }, [id]);
@@ -33,12 +34,43 @@ export default function UpdateCategory() {
     }));
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImage(file);
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
 
     try {
-      await axios.put(`${BASE_URL}/categories/${id}`, formData);
+      const formDataToSend = new FormData();
+      
+      // Create categoryDTO object
+      const categoryDTO = {
+        categoryName: formData.categoryName,
+        categoryDescription: formData.categoryDescription,
+      };
+      
+      // Append categoryDTO as JSON string
+      formDataToSend.append('categoryDTO', new Blob([JSON.stringify(categoryDTO)], {
+        type: 'application/json'
+      }));
+      
+      // Append image file only if a new image is selected
+      if (selectedImage) {
+        formDataToSend.append('image', selectedImage);
+      }
+
+      await updateCategoryById(id, formDataToSend);
       alert("Category updated successfully!");
       navigate(`/category/${id}`);
     } catch (err) {
@@ -52,7 +84,7 @@ export default function UpdateCategory() {
           } else if (lower.includes("description")) {
             validationErrors.categoryDescription = msg;
           } else if (lower.includes("image")) {
-            validationErrors.imageUrl = msg;
+            validationErrors.image = msg;
           }
         });
         setErrors(validationErrors);
@@ -98,19 +130,45 @@ export default function UpdateCategory() {
             <p className="text-red-500 ml-44 -mt-3">{errors.categoryDescription}</p>
           )}
 
-          {/* Image URL */}
-          <div className="flex items-center gap-4">
-            <label className="w-40 text-right font-medium">Image URL:</label>
-            <input
-              type="text"
-              name="imageUrl"
-              value={formData.imageUrl}
-              onChange={handleChange}
-              className="input input-bordered w-full"
-            />
+          {/* Image Upload */}
+          <div className="flex items-start gap-4">
+            <label className="w-[123px] text-right font-medium">Image:</label>
+            <div className="flex-1 space-y-4">
+              {/* Current Image Display */}
+              {currentImageUrl && !imagePreview && (
+                <div>
+                  <p className="text-sm font-medium mb-2">Current Image:</p>
+                  <img
+                    src={currentImageUrl}
+                    alt="Current category"
+                    className="max-w-xs max-h-48 object-contain rounded-lg border"
+                  />
+                </div>
+              )}
+              
+              {/* File Upload */}
+              <input
+                type="file"
+                accept="image/*"
+                className="file-input file-input-bordered w-full"
+                onChange={handleImageChange}
+              />
+              
+              {/* New Image Preview */}
+              {imagePreview && (
+                <div>
+                  <p className="text-sm font-medium mb-2">New Image Preview:</p>
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="max-w-xs max-h-48 object-contain rounded-lg border"
+                  />
+                </div>
+              )}
+            </div>
           </div>
-          {errors.imageUrl && (
-            <p className="text-red-500 ml-44 -mt-3">{errors.imageUrl}</p>
+          {errors.image && (
+            <p className="text-red-500 ml-44 -mt-3">{errors.image}</p>
           )}
 
           <div className="text-center pt-4">

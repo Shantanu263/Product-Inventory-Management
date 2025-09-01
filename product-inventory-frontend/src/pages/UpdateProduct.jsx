@@ -7,30 +7,27 @@ export default function UpdateProduct() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [imageFile, setImageFile] = useState(null);
-  const [galleryFiles, setGalleryFiles] = useState([]);
   const [product, setProduct] = useState({
     name: "",
     price: "",
     quantity: "",
-    description: "",
+    productDescription: "",
     imageUrl: "",
     categoryId: "",
-    galleryImages: []
   });
-  const [removedGalleryIds, setRemovedGalleryIds] = useState([]);
 
   useEffect(() => {
     fetchProductById(id)
       .then(res => {
         const p = res.data;
+        console.log("Received product data:", p);
         setProduct({
           name: p.name,
           price: p.price,
           quantity: p.quantity,
-          description: p.productDescription || "",
+          productDescription: p.productDescription || "",
           imageUrl: p.imageUrl || "",
           categoryId: p.category?.categoryId || "",
-          galleryImages: p.galleryImages || []
         });
       })
       .catch(err => console.error("Failed to load product:", err));
@@ -45,34 +42,36 @@ export default function UpdateProduct() {
     setProduct(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleRemoveGallery = (imgId) => {
-    setRemovedGalleryIds(prev => [...prev, imgId]);
-    setProduct(prev => ({
-      ...prev,
-      galleryImages: prev.galleryImages.filter(img => img.id !== imgId)
-    }));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
+    console.log("Current product state:", product);
+
+    // Convert string values to appropriate types
     const productDTO = {
       name: product.name,
-      price: product.price,
-      quantity: product.quantity,
-      productDescription: product.description,
-      categoryId: product.categoryId,
-      removedGalleryIds: removedGalleryIds
+      price: Number(product.price),
+      quantity: Number(product.quantity),
+      productDescription: product.productDescription,
+      categoryId: Number(product.categoryId),
     };
+    
+    console.log("Sending productDTO:", productDTO);
 
-    formData.append(
-      "productDTO",
-      new Blob([JSON.stringify(productDTO)], { type: "application/json" })
-    );
+    const formData = new FormData();
+    
+    // Create a Blob with the correct content type
+    const productDTOBlob = new Blob([JSON.stringify(productDTO)], {
+      type: 'application/json'
+    });
+    
+    // Append as a part named "productDTO"
+    formData.append("productDTO", productDTOBlob);
 
-    if (imageFile) formData.append("image", imageFile);
-    galleryFiles.forEach(file => formData.append("galleryImages", file));
+    // Append image if present
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
 
     updateProductById(id, formData)
       .then(() => {
@@ -81,7 +80,8 @@ export default function UpdateProduct() {
       })
       .catch(err => {
         console.error("Failed to update product:", err);
-        alert("Failed to update. Check console for errors.");
+        const errorMessage = err.response?.data?.message || err.message || "Failed to update product";
+        alert(errorMessage);
       });
   };
 
@@ -131,8 +131,8 @@ export default function UpdateProduct() {
           <div className="flex items-start gap-4">
             <label className="w-40 text-right font-medium">Description:</label>
             <textarea
-              name="description"
-              value={product.description}
+              name="productDescription"
+              value={product.productDescription}
               onChange={handleChange}
               className="textarea textarea-bordered w-full"
               rows="3"
@@ -140,12 +140,12 @@ export default function UpdateProduct() {
           </div>
 
           {/* Current Display Image */}
-{product.imageUrl && (
-  <div className="flex items-center gap-4">
-    <label className="w-40 text-right font-medium">Current Image:</label>
-    <img src={product.imageUrl} alt="Current" className="w-24 h-24 object-cover rounded" />
-  </div>
-)}
+          {product.imageUrl && (
+            <div className="flex items-center gap-4">
+              <label className="w-[128px] text-right font-medium">Current Image:</label>
+              <img src={product.imageUrl} alt="Current" className="w-24 h-24 object-cover rounded" />
+            </div>
+          )}
 
           {/* Upload New Display Image */}
           <div className="flex items-center gap-4">
@@ -156,37 +156,10 @@ export default function UpdateProduct() {
               className="file-input file-input-bordered w-full"
               onChange={(e) => setImageFile(e.target.files[0])}
             />
+            {/* <p className="text-sm text-gray-500">
+              {product.imageUrl ? "Leave empty to keep current image" : "Upload a new image"}
+            </p> */}
           </div>
-
-          {/* Gallery Images */}
-<div className="flex items-start gap-4">
-  <label className="w-40 text-right font-medium mt-2">Gallery Images:</label>
-  <div className="flex flex-col gap-2 w-full">
-    {/* Existing Gallery */}
-    <div className="flex gap-2 flex-wrap">
-      {product.galleryImages.map(img => (
-        <div key={img.id} className="relative group">
-          <img src={img.imageUrl} alt="Gallery" className="w-24 h-24 object-cover rounded" />
-          <button
-            type="button"
-            onClick={() => handleRemoveGallery(img.id)}
-            className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-2 py-1 text-xs opacity-0 group-hover:opacity-100 transition"
-          >
-            ✕
-          </button>
-        </div>
-      ))}
-    </div>
-    {/* Add New Gallery */}
-    <input
-      type="file"
-      accept="image/*"
-      multiple
-      className="file-input file-input-bordered w-full mt-2"
-      onChange={(e) => setGalleryFiles(Array.from(e.target.files))}
-    />
-  </div>
-</div>
 
           {/* Category */}
           <div className="flex items-center gap-4">

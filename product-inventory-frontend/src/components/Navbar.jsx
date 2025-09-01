@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { logoutUser } from '../api';
 import LayoutWrapper from './LayoutWrapper';
-import { Menu, LogOut, LockKeyhole, Search, SunMedium, Moon, ShoppingCart, Box, Plus } from "lucide-react";
+import { Menu, LogOut, LockKeyhole, Search, SunMedium, Moon, ShoppingCart, Box, Plus, Inbox, FolderPlus } from "lucide-react";
 import { CartContext } from '../context/CartContext';
 
 const Navbar = ({ onSearch }) => {
@@ -91,11 +91,33 @@ const Navbar = ({ onSearch }) => {
                   <Menu />
                 </button>
                 {menuOpen && (
-                  <div className="absolute left-0 mt-2 z-50 bg-base-100 text-base-content border rounded-box w-52 shadow flex flex-col">
-                    <Link to="/add-product" className="block px-4 py-2 hover:bg-base-200" onClick={() => setMenuOpen(false)}><Plus/> Add Product</Link>
-                    <button onClick={() => { handleBulkUploadClick(); setMenuOpen(false); }} className="block px-4 py-2 text-left hover:bg-base-200">📥 Bulk Upload</button>
-                    <Link to="/add-category" className="block px-4 py-2 hover:bg-base-200" onClick={() => setMenuOpen(false)}>📁 Add Category</Link>
-                  </div>
+<div className="absolute left-0 mt-2 z-50 bg-base-100 text-base-content border rounded-box w-52 shadow flex flex-col">
+  <Link
+    to="/add-product"
+    className="flex items-center gap-2 px-4 py-2 hover:bg-base-200"
+    onClick={() => setMenuOpen(false)}
+  >
+    <Plus className="w-4 h-4" /> 
+    Add Product
+  </Link>
+
+  <button
+    onClick={() => { handleBulkUploadClick(); setMenuOpen(false); }}
+    className="flex items-center gap-2 px-4 py-2 text-left hover:bg-base-200"
+  >
+    <Inbox className="w-4 h-4" /> 
+    Bulk Upload
+  </button>
+
+  <Link
+    to="/add-category"
+    className="flex items-center gap-2 px-4 py-2 hover:bg-base-200"
+    onClick={() => setMenuOpen(false)}
+  >
+    <FolderPlus className="w-4 h-4" /> 
+    Add Category
+  </Link>
+</div>
                 )}
               </div>
             )}
@@ -183,7 +205,7 @@ const Navbar = ({ onSearch }) => {
               </div>
               <ul tabIndex={0} className="mt-3 z-[100] p-2 shadow menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box w-52">
                 <li>
-                  <Link to="/change-password" className="text-base font-medium"><LockKeyhole />Change Your Password</Link>
+                  <Link to="/change-password" className="text-base font-medium"><LockKeyhole />Change Password</Link>
                 </li>
                 <li>
                   <button onClick={handleLogout} className="text-base font-medium"><LogOut /> Logout</button>

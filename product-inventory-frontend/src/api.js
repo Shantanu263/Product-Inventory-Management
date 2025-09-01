@@ -148,7 +148,9 @@ export const fetchProductsByName = (name) =>
   api.get(`${BASE_PRODUCT_URL}/search?name=${name}&pageNumber=0&pageSize=15&sortBy=productId&order=asc`);
 
 export const addProduct = (productData) =>
-  api.post(BASE_PRODUCT_URL, productData);
+  api.post(BASE_PRODUCT_URL, productData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
 
 export const deleteProductById = (id) =>
   api.delete(`${BASE_PRODUCT_URL}/${id}`);
@@ -175,13 +177,19 @@ export const deleteCategory = (id) =>
   api.delete(`${BASE_CATEGORY_URL}/${id}`);
 
 export const addCategory = (categoryData) =>
-  api.post(BASE_CATEGORY_URL, categoryData);
+  api.post(BASE_CATEGORY_URL, categoryData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
 
 export const updateCategoryById = (id, categoryData) =>
-  api.put(`${BASE_CATEGORY_URL}/${id}`, categoryData);
+  api.put(`${BASE_CATEGORY_URL}/${id}`, categoryData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
 
 export const createCategory = (categoryDTO) =>
-  api.post(BASE_CATEGORY_URL, categoryDTO);
+  api.post(BASE_CATEGORY_URL, categoryDTO, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
 
 // ----------- Auth APIs -----------
 export const loginUser = (credentials) =>

@@ -16,7 +16,6 @@ export default function ProductDetails() {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [cartQuantity, setCartQuantity] = useState(0);
-  const [selectedImage, setSelectedImage] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -32,7 +31,6 @@ export default function ProductDetails() {
       .then((res) => {
         const data = res.data;
         setProduct(data);
-        setSelectedImage(data.imageUrls?.[0] || data.imageUrl || null);
         // fetch user's rating separately
         getUserProductRating(data.id)
           .then((r) => {
@@ -134,7 +132,6 @@ export default function ProductDetails() {
     setMessage("");
   };
   
-  
   if (!product) return <p className="text-center mt-8 text-lg">Loading...</p>;
   
   return (
@@ -149,13 +146,13 @@ export default function ProductDetails() {
         </button>
   
         <div className="flex flex-col lg:flex-row gap-12">
-          {/* Left Side - Image Gallery */}
+          {/* Left Side - Product Image */}
           <div className="w-full lg:w-1/2">
             {/* Main Product Image */}
             <div className="w-full aspect-square bg-base-100 rounded-lg overflow-hidden mb-6">
-              {selectedImage ? (
+              {product.imageUrl ? (
                 <img
-                  src={selectedImage}
+                  src={product.imageUrl}
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />
@@ -164,30 +161,6 @@ export default function ProductDetails() {
                   No Image
                 </div>
               )}
-            </div>
-  
-            {/* Thumbnail Images */}
-            <div className="flex gap-4">
-              {(product.imageUrls && product.imageUrls.length > 0
-                ? product.imageUrls
-                : [product.imageUrl]
-              )?.map((img, idx) => (
-                <div
-                  key={idx}
-                  className={`w-20 h-20 rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-200 ${
-                    selectedImage === img
-                      ? "border-primary ring-2 ring-primary/20"
-                      : "border-base-300 hover:border-primary/50"
-                  }`}
-                  onClick={() => setSelectedImage(img)}
-                >
-                  <img
-                    src={img}
-                    alt={`Thumbnail ${idx}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
             </div>
           </div>
   
@@ -200,13 +173,13 @@ export default function ProductDetails() {
               </div>
   
               {/* Product Name with avg rating */}
-             <h1 className="text-4xl font-bold text-base-content leading-tight flex items-center gap-4">
-               {product.name}
+              <h1 className="text-4xl font-bold text-base-content leading-tight flex items-center gap-4">
+                {product.name}
                 <span className="flex items-center text-lg font-medium text-yellow-500 gap-1">
                   <Star size={20} />
                   {product.averageRating?.toFixed(1) || 0}/5
                 </span>
-             </h1>
+              </h1>
   
               {/* Price */}
               <div className="text-3xl font-semibold text-base-content">
@@ -259,7 +232,7 @@ export default function ProductDetails() {
                   <button
                     onClick={handleBuyNow}
                     disabled={product.quantity === 0}
-                    className="w-full py-3 px-6 bg-base-100 text-base-content border-2 border-base-content rounded-lg font-medium hover:bg-base-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-3 px-6 bg-base-100 text-base-content border-2 border-base-content rounded-lg font-medium hover:bg-base-content/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Buy it now
                   </button>
@@ -271,10 +244,10 @@ export default function ProductDetails() {
                   Product Description
                 </label>              
                 <div>
-                <p className="text-base-content/80 leading-relaxed">
-                  {product.productDescription || "A nod to the past, reimagined for the now, the Medallion Reboot T-Shirt brings back a legacy design with a bold new attitude. Crafted from midweight French terry cotton, it features a reworked 3D emblem at the chest, an evolved expression of the Medallion identity."}
-                </p>
-              </div>
+                  <p className="text-base-content/80 leading-relaxed">
+                    {product.productDescription || "A nod to the past, reimagined for the now, the Medallion Reboot T-Shirt brings back a legacy design with a bold new attitude. Crafted from midweight French terry cotton, it features a reworked 3D emblem at the chest, an evolved expression of the Medallion identity."}
+                  </p>
+                </div>
   
               {/* Additional Product Info */}
               <div className="pt-6 border-t border-base-300">
@@ -314,22 +287,22 @@ export default function ProductDetails() {
                       <span className="text-sm font-medium text-base-content">You have rated this product:</span>
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((star) => (
-<svg
-  key={star}
-  onClick={() => handleRate(star)}
-  onMouseEnter={() => setHoverRating(star)}
-  onMouseLeave={() => setHoverRating(0)}
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  fill={star <= (hoverRating || rating) ? "#fbbf24" : "#9ca3af"}
-  className="w-6 h-6 cursor-pointer hover:scale-110 transition-transform duration-200"
->
-  <path
-    fillRule="evenodd"
-    d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.03 4.884 5.211.442c1.164.099 1.636 1.545.749 2.305l-3.946 3.39 1.184 5.073c.271 1.162-.984 2.062-2.002 1.47L12 18.354l-4.438 2.42c-1.018.592-2.273-.308-2.002-1.47l1.184-5.072-3.946-3.39c-.887-.76-.415-2.207.749-2.306l5.211-.442 2.03-4.883z"
-    clipRule="evenodd"
-  />
-</svg>
+                          <svg
+                            key={star}
+                            onClick={() => handleRate(star)}
+                            onMouseEnter={() => setHoverRating(star)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill={star <= (hoverRating || rating) ? "#fbbf24" : "#9ca3af"}
+                            className="w-6 h-6 cursor-pointer hover:scale-110 transition-transform duration-200"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.03 4.884 5.211.442c1.164.099 1.636 1.545.749 2.305l-3.946 3.39 1.184 5.073c.271 1.162-.984 2.062-2.002 1.47L12 18.354l-4.438 2.42c-1.018.592-2.273-.308-2.002-1.47l1.184-5.072-3.946-3.39c-.887-.76-.415-2.207.749-2.306l5.211-.442 2.03-4.883z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
                         ))}
                       </div>
                       {rating !== originalUserRating && (

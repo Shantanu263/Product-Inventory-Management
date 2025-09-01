@@ -37,7 +37,7 @@ const RequireAuth = ({ children, allowedRoles }) => {
 
 const AppLayout = ({ children }) => {
   const location = useLocation();
-  const hideNavbarRoutes = ['/login', '/signup'];
+  const hideNavbarRoutes = ['/login', '/signup', '/forgot-password', '/reset-password'];
   const hideNavbar = hideNavbarRoutes.includes(location.pathname);
   return (
     <div className="min-h-screen flex flex-col bg-[#f1f2f4] dark:bg-base-200 w-full overflow-x-hidden">
